@@ -1,4 +1,4 @@
-import { UserModel } from './attribute';
+import { UserModel } from './attributes';
 
 class UserFactory {
   private static _instance: UserModel;

@@ -6,6 +6,7 @@ declare global {
 
   type KeyOf<T> = keyof T;
   type ValueOf<T> = T[keyof T];
+  type UnknownObject = NonNullable<unknown>;
 }
 
 export {};
