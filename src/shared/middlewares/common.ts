@@ -3,8 +3,16 @@ import { NextFunction } from 'express';
 import asyncMw from 'express-asyncmw';
 import SequelizeFQP from '@krsbx/sequelize-fqp';
 import { ZodError } from 'zod';
-import { UniqueConstraintError, ValidationError } from 'sequelize';
-import { createCodeStatus } from '@krsbx/response-formatter';
+import {
+  UniqueConstraintError,
+  ValidationError,
+  ValidationErrorItem,
+} from 'sequelize';
+import {
+  createBadRequestResponse,
+  createCodeStatus,
+} from '@krsbx/response-formatter';
+import { hasOwnProperty } from '../common';
 
 export const queryParserMw = asyncMw<{
   reqQuery: {
@@ -33,9 +41,24 @@ export const errorHandlerMw = (
   if (
     err instanceof ZodError ||
     err instanceof ValidationError ||
-    err instanceof UniqueConstraintError
+    err instanceof UniqueConstraintError ||
+    err instanceof SyntaxError
   ) {
-    return res.status(400).json(_.pick(err, ['name', 'errors']));
+    const json = _.pick(err, ['name', 'errors']);
+
+    if (
+      err instanceof UniqueConstraintError &&
+      hasOwnProperty<ValidationErrorItem[]>(json, 'errors')
+    ) {
+      _.forEach(json.errors, (error) => {
+        delete error.instance?.dataValues;
+      });
+    }
+
+    return res.status(400).json({
+      ...createCodeStatus(400),
+      message: json,
+    });
   }
 
   console.log(err);
