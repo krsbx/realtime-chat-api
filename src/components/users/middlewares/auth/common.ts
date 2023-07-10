@@ -5,6 +5,7 @@ import { createUnauthorizedResponse } from '@krsbx/response-formatter';
 import { BaseUserModel, UserAttribute } from '../../models/attributes';
 import { signJwtToken, verifyJwtToken } from '../../utils/jwt';
 import { loginUserSchema } from '../../utils/schema';
+import streamInstance from '../../../../config/stream';
 
 export const validateUserLoginPayloadMw = asyncMw<{
   reqBody: z.infer<typeof loginUserSchema>;
@@ -18,11 +19,14 @@ export const createUserAccessTokenMw = asyncMw<{
   extends: {
     user: BaseUserModel;
     token: string;
+    streamToken: string;
   };
 }>(async (req, res, next) => {
   const token = signJwtToken(_.omit(req.user.dataValues, ['password']), true);
+  const streamToken = streamInstance.createToken(req.user.dataValues.uuid);
 
   req.token = token;
+  req.streamToken = streamToken;
 
   return next();
 });
