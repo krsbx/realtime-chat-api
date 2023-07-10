@@ -2,7 +2,9 @@ import { DataTypes as DT, Model, Sequelize } from 'sequelize';
 import { Database } from 'sequelize-db-type/helper';
 import { USER_ROLE } from '../../../shared/constant';
 import UserFactory from './UserFactory';
-import { UserModel } from './attribute';
+import { UserModel } from './attributes';
+import factory from '../../../shared/factory';
+import postFactory from './postFactory';
 
 function init(sequelize: Sequelize, DataTypes: typeof DT) {
   class User extends Model {
@@ -54,9 +56,12 @@ function init(sequelize: Sequelize, DataTypes: typeof DT) {
     }
   );
 
-  UserFactory.init(User);
+  factory(User);
+  postFactory(User as never);
 
-  return User as UserModel;
+  UserFactory.init(User as never);
+
+  return User as unknown as UserModel;
 }
 
 export default init;
