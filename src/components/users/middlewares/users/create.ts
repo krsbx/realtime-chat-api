@@ -19,6 +19,7 @@ export const createUserMw = asyncMw<{
 
     await streamInstance.upsertUser({
       id: user.dataValues.uuid,
+      name: user.dataValues.username ?? '',
       username: user.dataValues.username ?? '',
       role: user.dataValues.role,
     });

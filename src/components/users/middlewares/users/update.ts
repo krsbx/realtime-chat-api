@@ -29,6 +29,7 @@ export const updateUserMw = asyncMw<{
     await streamInstance.partialUpdateUser({
       id: user.dataValues.uuid,
       set: {
+        name: user.dataValues.username ?? '',
         username: user.dataValues.username ?? '',
         role: user.dataValues.role,
       },
